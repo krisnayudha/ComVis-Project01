@@ -1,25 +1,25 @@
-import cv2
+# this file use for testing your object detection with minimum requirement
 
+import cv2 
+import numpy as np
 
-image = cv2.imread("shapes1.png",1) # load image in color
+cap = cv2.VideoCapture(1)
 
-# convert to grayscale
-gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+while True:
+	ret, frame = cap.read()
+	cv2.imshow('input', frame)
+	if cv2.waitkey(1) == 99:		# press "C" to capture
+		break
 
-#find threshold of the image
-_, thrash = cv2.threshold(gray_image, 240, 255, cv2.THRESH_BINARY)
-contours, _ = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+cap.release()
 
-for contour in contours:
-	shape = cv2.approxPolyDP(contour, 0.01*cv2.arcLength(contour, True), True)
-	x_cor = shape.ravel()[0]
-	y_cor = shape.ravel()[1]
+cv2.imshow('Captured Image', frame)
+hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+lower_yellow = np.array9([0, 199, 204])
+upper_yellow = np.array([155, 253, 255])
+mask1 = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-	if len(shape) == 3:
-		cv2.drawContours(image, [shape], 0, (0,0,255), 4)
-		cv2.putText(image, "Triangle", (x_cor, y_cor), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0))
+bit_yellow = cv2.bitwise_and(hsv, hsv, mask=mask1)
+imgyellow = cv2.cvtColor(bit_yellow, cv2.COLOR_HSV2BGR)
 
-cv2.imshow("shape", image)
-cv2.imshow("Bin", thrash)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.imshow('yellow', imgyellow)
